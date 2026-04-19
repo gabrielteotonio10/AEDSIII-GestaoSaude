@@ -1,0 +1,40 @@
+:root {
+    /* Paleta de Cores: Domínio Verde (Health Theme) */
+    --primary: #10b981;       
+    --primary-dark: #059669;  
+    --primary-light: #d1fae5; 
+    
+    /* Neutros Esverdeados */
+    --bg-body: #f4fdf8;      
+    --bg-surface: #ffffff;    
+    
+    /* A Grande Mudança: Barra Lateral Verde Floresta */
+    --sidebar-bg: #064e3b;    
+    --sidebar-hover: #047857; 
+    
+    /* Textos e Bordas */
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    
+    /* Status */
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --info: #0ea5e9;
+    --info-light: #e0f2fe;
+    
+    /* Sombras e Transições */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --transition: all 0.2s ease-in-out;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+}

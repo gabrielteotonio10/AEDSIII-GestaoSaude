@@ -1,0 +1,33 @@
+# --- Java & Maven ---
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# --- JDK & Runtimes (CUIDADO: Isso causou seu erro) ---
+.jdk/
+jdk*/
+java*/
+*.zip
+*.tar.gz
+*.msi
+*.exe
+
+# --- IDEs (VS Code, IntelliJ) ---
+.vscode/
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+bin/
+
+# --- Arquivos do Sistema ---
+Thumbs.db
+.DS_Store
+
+# --- Dados do Banco Binário (AEDS III) ---
+data/
+*.db
+*.index

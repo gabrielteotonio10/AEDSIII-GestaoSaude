@@ -1,0 +1,233 @@
+/* ══════════════════════════════════════════════════════════
+   layout.css — HealthGest
+══════════════════════════════════════════════════════════ */
+
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  background: var(--sidebar-bg);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  z-index: 1000;
+}
+.sidebar-header {
+  padding: 24px;
+  font-size: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sidebar-header h2 span {
+  color: var(--primary);
+  font-weight: 300;
+}
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 24px;
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: var(--transition);
+  font-size: 0.93rem;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+}
+.nav-item:hover {
+  background: var(--sidebar-hover);
+  color: #fff;
+}
+.nav-item.active {
+  background: var(--sidebar-hover);
+  color: var(--primary);
+  border-left-color: var(--primary);
+}
+.nav-item i {
+  width: 18px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.logout-link {
+  color: #fca5a5 !important;
+}
+.logout-link:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #ef4444 !important;
+}
+
+/* ── Main Wrapper ────────────────────────────────────────── */
+.main-wrapper {
+  flex: 1;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Topbar ──────────────────────────────────────────────── */
+.topbar {
+  background: var(--bg-surface);
+  height: 68px;
+  padding: 0 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 900;
+}
+.breadcrumb {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+.breadcrumb strong {
+  color: var(--primary);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.notifications {
+  position: relative;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  padding: 8px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+.notifications:hover {
+  background: var(--bg-body);
+}
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--danger);
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 5px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+/* Perfil clicável */
+.perfil-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.perfil-btn:hover {
+  background: var(--bg-body);
+  border-color: var(--primary);
+}
+.user-info {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+.user-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.user-role {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+.avatar {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.chevron-icon {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+.perfil-btn.open .chevron-icon {
+  transform: rotate(180deg);
+}
+
+/* ── Content ─────────────────────────────────────────────── */
+.content {
+  flex: 1;
+  padding: 28px 30px;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+.page-header h1 {
+  font-size: 1.7rem;
+  color: var(--text-main);
+}
+.page-header p {
+  color: var(--text-muted);
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+/* Seções */
+.crud-section {
+  display: none;
+}
+.crud-section.active {
+  display: block;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+  background: var(--bg-surface);
+  padding: 18px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+.footer-links a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.footer-links a:hover {
+  text-decoration: underline;
+}

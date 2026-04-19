@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthGest | Gestão Clínica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════
+     TELA DE LOGIN
+════════════════════════════════════════════════════════ -->
+    <div id="telaLogin" style="display:none">
+        <div class="login-page">
+
+            <div class="login-branding">
+                <div class="branding-content">
+                    <div class="brand-logo">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                        <h1>Health<span>Gest</span></h1>
+                    </div>
+                    <p class="brand-tagline">Gestão clínica moderna, segura e eficiente.</p>
+                    <ul class="brand-features">
+                        <li><i class="fa-solid fa-check-circle"></i> Prontuários em arquivo binário</li>
+                        <li><i class="fa-solid fa-check-circle"></i> Exclusão lógica com lápide</li>
+                        <li><i class="fa-solid fa-check-circle"></i> Controle de acesso por papel</li>
+                        <li><i class="fa-solid fa-check-circle"></i> Pesquisa textual KMP/Boyer-Moore</li>
+                    </ul>
+                </div>
+                <p class="brand-footer">Desenvolvido para AEDs III · PUC Minas · 2026</p>
+            </div>
+
+            <div class="login-panel">
+                <div class="login-card">
+
+                    <!-- LOGIN -->
+                    <form class="auth-form active" id="formLogin">
+                        <div class="form-header">
+                            <h2>Bem-vindo de volta</h2>
+                            <p class="subtitle">Insira suas credenciais para acessar o sistema</p>
+                        </div>
+                        <div class="input-group">
+                            <label for="loginEmail">E-mail</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="loginSenha">Senha</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="loginSenha" placeholder="••••••••" required>
+                                <button type="button" class="btn-toggle-senha"
+                                    onclick="toggleSenha('loginSenha', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <a href="#" class="text-link" id="btnEsqueciSenha">Esqueci minha senha</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Entrar <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <div class="divider"><span>ou</span></div>
+                        <button type="button" class="btn btn-secondary" id="btnIrCadastro">
+                            Criar nova conta
+                        </button>
+                    </form>
+
+                    <!-- CADASTRO -->
+                    <form class="auth-form" id="formCadastro">
+                        <div class="form-header">
+                            <h2>Criar Conta</h2>
+                            <p class="subtitle">Preencha os dados para se cadastrar no sistema</p>
+                        </div>
+                        <div class="input-group">
+                            <label for="cadNome">Nome Completo</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-user"></i>
+                                <input type="text" id="cadNome" placeholder="Seu nome completo" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="cadCpf">CPF</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-id-card"></i>
+                                <input type="text" id="cadCpf" placeholder="00000000000" maxlength="11" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="cadEmail">E-mail</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="email" id="cadEmail" placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="cadPapel">Perfil de Acesso</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-user-tag"></i>
+                                <select id="cadPapel" required>
+                                    <option value="" disabled selected>Selecione seu perfil</option>
+                                    <option value="Médico">Médico</option>
+                                    <option value="Enfermeiro">Enfermeiro</option>
+                                    <option value="Recepcionista">Recepcionista</option>
+                                    <option value="Administrador">Administrador</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group" id="divEspecialidade" style="display:none">
+                            <label for="cadEspecialidade">Especialidade</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-stethoscope"></i>
+                                <input type="text" id="cadEspecialidade" placeholder="Ex: Cardiologia, Pediatria...">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="cadSenha">Senha</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres" minlength="6"
+                                    required>
+                                <button type="button" class="btn-toggle-senha" onclick="toggleSenha('cadSenha', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="cadConfirmaSenha">Confirmar Senha</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="cadConfirmaSenha" placeholder="Repita a senha" required>
+                                <button type="button" class="btn-toggle-senha"
+                                    onclick="toggleSenha('cadConfirmaSenha', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Criar Conta <i class="fa-solid fa-user-plus"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnCancelarCadastro">Cancelar</button>
+                    </form>
+
+                    <!-- RECUPERAR SENHA -->
+                    <form class="auth-form" id="formRecuperar">
+                        <div class="form-header">
+                            <div class="recover-icon"><i class="fa-solid fa-key"></i></div>
+                            <h2>Esqueceu a senha?</h2>
+                            <p class="subtitle">Informe seu e-mail e enviaremos as instruções</p>
+                        </div>
+                        <div class="input-group">
+                            <label for="recEmail">E-mail Cadastrado</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="email" id="recEmail" placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Enviar Instruções <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnVoltarLogin">
+                            <i class="fa-solid fa-arrow-left"></i> Voltar ao Login
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+     SISTEMA PRINCIPAL
+════════════════════════════════════════════════════════ -->
+    <div id="telaApp" style="display:none">
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Health<span>Gest</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-secao="section-pacientes">
+                    <i class="fa-solid fa-users"></i> Pacientes
+                </a>
+                <a href="#" class="nav-item" data-secao="section-consultas">
+                    <i class="fa-solid fa-calendar-check"></i> Consultas
+                </a>
+                <a href="#" class="nav-item" data-secao="section-procedimentos">
+                    <i class="fa-solid fa-syringe"></i> Procedimentos
+                </a>
+                <a href="#" class="nav-item" data-secao="section-usuarios">
+                    <i class="fa-solid fa-user-gear"></i> Usuários
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item config" data-secao="section-config">
+                    <i class="fa-solid fa-gear"></i> Configurações
+                </a>
+                <a href="#" class="nav-item logout-link" id="btnLogout">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair
+                </a>
+            </div>
+        </aside>
+
+        <div class="main-wrapper">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <div class="breadcrumb">Início / <strong id="breadcrumbAtual">Pacientes</strong></div>
+                </div>
+                <div class="user-profile">
+                    <div class="notifications">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge">2</span>
+                    </div>
+                    <!-- Perfil clicável com dropdown -->
+                    <div class="perfil-wrapper" id="perfilWrapper">
+                        <button class="perfil-btn" id="btnPerfil">
+                            <div class="user-info">
+                                <span class="user-name" id="topbarNome">—</span>
+                                <span class="user-role" id="topbarPapel">—</span>
+                            </div>
+                            <div class="avatar" id="avatarEl">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </div>
+                            <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                        </button>
+                        <div class="perfil-dropdown" id="perfilDropdown">
+                            <div class="dropdown-header">
+                                <div class="avatar-lg" id="avatarDropdown">
+                                    <i class="fa-solid fa-user-doctor"></i>
+                                </div>
+                                <div>
+                                    <strong id="dropdownNome">—</strong>
+                                    <span id="dropdownPapel" class="dropdown-papel">—</span>
+                                </div>
+                            </div>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item" id="btnEditarPerfil">
+                                <i class="fa-solid fa-user-pen"></i> Editar Perfil
+                            </a>
+                            <a href="#" class="dropdown-item" id="btnLogoutDropdown">
+                                <i class="fa-solid fa-right-from-bracket"></i> Sair da Conta
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="content">
+
+                <!-- ── SEÇÃO PACIENTES ── -->
+                <section id="section-pacientes" class="crud-section active">
+                    <div class="page-header">
+                        <div>
+                            <h1>Gestão de Pacientes</h1>
+                            <p>Controle de prontuários e exclusão lógica em arquivo binário.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btnNovoPaciente">
+                            <i class="fa-solid fa-plus"></i> Novo Cadastro
+                        </button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-blue"><i class="fa-solid fa-hospital-user"></i></div>
+                            <div class="stat-info">
+                                <h3>Pacientes Ativos</h3>
+                                <p id="statAtivos">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-red"><i class="fa-solid fa-notes-medical"></i></div>
+                            <div class="stat-info">
+                                <h3>Com Alergias</h3>
+                                <p id="statAlergias">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-green"><i class="fa-solid fa-hashtag"></i></div>
+                            <div class="stat-info">
+                                <h3>Último ID</h3>
+                                <p id="statUltimoId">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-section">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="number" id="inputBuscaId" placeholder="Pesquisar por ID...">
+                                <button class="btn btn-secondary" id="btnBuscar">Localizar</button>
+                            </div>
+                            <div class="toolbar-actions">
+                                <button class="btn btn-outline" id="btnRecarregar" title="Atualizar">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="8%">ID</th>
+                                        <th width="30%">Nome</th>
+                                        <th width="20%">CPF</th>
+                                        <th width="22%">Alergias</th>
+                                        <th width="10%">Status</th>
+                                        <th width="10%">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listaPacientes"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ── SEÇÃO CONSULTAS ── -->
+                <section id="section-consultas" class="crud-section">
+                    <div class="page-header">
+                        <div>
+                            <h1>Gestão de Consultas</h1>
+                            <p>Agendamento e controle de consultas médicas.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btnNovaConsulta">
+                            <i class="fa-solid fa-plus"></i> Nova Consulta
+                        </button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-blue"><i class="fa-solid fa-calendar-check"></i></div>
+                            <div class="stat-info">
+                                <h3>Total de Consultas</h3>
+                                <p id="statTotalConsultas">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-green"><i class="fa-solid fa-clock"></i></div>
+                            <div class="stat-info">
+                                <h3>Marcadas</h3>
+                                <p id="statMarcadas">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-red"><i class="fa-solid fa-circle-check"></i></div>
+                            <div class="stat-info">
+                                <h3>Realizadas</h3>
+                                <p id="statRealizadas">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-section">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-filter"></i>
+                                <select id="filtroStatusConsulta"
+                                    style="border:none;background:transparent;outline:none;padding:8px;cursor:pointer;">
+                                    <option value="">Todos os status</option>
+                                    <option value="Marcada">Marcada</option>
+                                    <option value="Realizada">Realizada</option>
+                                    <option value="Cancelada">Cancelada</option>
+                                </select>
+                            </div>
+                            <div class="toolbar-actions">
+                                <button class="btn btn-outline" id="btnRecarregarConsulta" title="Atualizar">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="6%">ID</th>
+                                        <th width="18%">Data/Hora</th>
+                                        <th width="22%">Paciente</th>
+                                        <th width="22%">Médico</th>
+                                        <th width="14%">Status</th>
+                                        <th width="18%">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listaConsultas"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ── SEÇÃO PROCEDIMENTOS ── -->
+                <section id="section-procedimentos" class="crud-section">
+                    <div class="page-header">
+                        <div>
+                            <h1>Gestão de Procedimentos</h1>
+                            <p>Catálogo de exames e serviços clínicos.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btnNovoProcedimento">
+                            <i class="fa-solid fa-plus"></i> Novo Procedimento
+                        </button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-blue"><i class="fa-solid fa-syringe"></i></div>
+                            <div class="stat-info">
+                                <h3>Total de Procedimentos</h3>
+                                <p id="statTotalProcedimentos">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-green"><i class="fa-solid fa-dollar-sign"></i></div>
+                            <div class="stat-info">
+                                <h3>Preço Médio</h3>
+                                <p id="statMediaPreco">R$ 0,00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-section">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="number" id="inputBuscaProc" placeholder="Pesquisar por ID...">
+                                <button class="btn btn-secondary" id="btnBuscarProc">Localizar</button>
+                            </div>
+                            <div class="toolbar-actions">
+                                <button class="btn btn-outline" id="btnRecarregarProc" title="Atualizar">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="10%">ID</th>
+                                        <th width="55%">Nome do Exame</th>
+                                        <th width="20%">Preço</th>
+                                        <th width="15%">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listaProcedimentos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ── SEÇÃO USUÁRIOS ── -->
+                <section id="section-usuarios" class="crud-section">
+                    <div class="page-header">
+                        <div>
+                            <h1>Gestão de Usuários</h1>
+                            <p>Controle de acesso e perfis do sistema.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btnNovoUsuario">
+                            <i class="fa-solid fa-plus"></i> Novo Usuário
+                        </button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-blue"><i class="fa-solid fa-users-gear"></i></div>
+                            <div class="stat-info">
+                                <h3>Total de Usuários</h3>
+                                <p id="statTotalUsuarios">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-green"><i class="fa-solid fa-user-doctor"></i></div>
+                            <div class="stat-info">
+                                <h3>Médicos</h3>
+                                <p id="statMedicos">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-red"><i class="fa-solid fa-user-shield"></i></div>
+                            <div class="stat-info">
+                                <h3>Administradores</h3>
+                                <p id="statAdmins">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-section">
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="number" id="inputBuscaUsuario" placeholder="Pesquisar por ID...">
+                                <button class="btn btn-secondary" id="btnBuscarUsuario">Localizar</button>
+                            </div>
+                            <div class="toolbar-actions">
+                                <button class="btn btn-outline" id="btnRecarregarUsuario" title="Atualizar">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="6%">ID</th>
+                                        <th width="25%">Nome</th>
+                                        <th width="25%">E-mail</th>
+                                        <th width="15%">Perfil</th>
+                                        <th width="18%">Especialidade</th>
+                                        <th width="11%">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listaUsuarios"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+            <footer class="footer">
+                <p>&copy; 2026 HealthGest System · AEDs III - PUC Minas</p>
+                <div class="footer-links">
+                    <a href="#">Suporte</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Documentação</a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ══ MODAIS PACIENTES ══════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="modalPaciente">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modalTitle"><i class="fa-solid fa-user-plus"></i> Cadastro de Paciente</h2>
+                    <button class="btn-close" id="btnFecharModal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formPaciente">
+                        <input type="hidden" id="pacienteId">
+                        <div class="form-grid">
+                            <div class="input-group full-width">
+                                <label for="nome">Nome Completo</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-regular fa-user"></i>
+                                    <input type="text" id="nome" placeholder="Nome do paciente" required>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="cpf">CPF</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-regular fa-id-card"></i>
+                                    <input type="text" id="cpf" placeholder="00000000000" maxlength="11" required>
+                                </div>
+                            </div>
+                            <div class="input-group full-width">
+                                <label for="alergiaInput">Alergias (Opcional)</label>
+                                <div class="alergia-add-box">
+                                    <input type="text" id="alergiaInput" placeholder="Ex: Penicilina...">
+                                    <button type="button" class="btn btn-secondary" id="btnAddAlergia">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="tags-container" id="alergiasTags"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="btnCancelarModal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="formPaciente">
+                        <i class="fa-solid fa-save"></i> Gravar no Arquivo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-confirm-overlay" id="modalConfirmacao">
+            <div class="modal-confirm">
+                <i class="fa-solid fa-circle-exclamation modal-confirm-icon"></i>
+                <h3>Excluir Paciente?</h3>
+                <p>A lápide será adicionada no arquivo binário.</p>
+                <div class="modal-confirm-actions">
+                    <button class="btn btn-outline" id="btnCancelarExclusao">Cancelar</button>
+                    <button class="btn btn-primary" id="btnConfirmarExclusao"
+                        style="background:#ef4444;border-color:#ef4444;">
+                        Sim, excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MODAIS PROCEDIMENTOS ══════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="modalProcedimento">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modalProcTitle"><i class="fa-solid fa-syringe"></i> Cadastro de Procedimento</h2>
+                    <button class="btn-close" id="btnFecharModalProc"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formProcedimento">
+                        <input type="hidden" id="procedimentoId">
+                        <div class="input-group">
+                            <label for="procNome">Nome do Exame / Procedimento</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-flask"></i>
+                                <input type="text" id="procNome" placeholder="Ex: Hemograma completo" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="procPreco">Preço (R$)</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                                <input type="number" id="procPreco" placeholder="0.00" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="btnCancelarModalProc">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="formProcedimento">
+                        <i class="fa-solid fa-save"></i> Gravar no Arquivo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-confirm-overlay" id="modalConfirmacaoProc">
+            <div class="modal-confirm">
+                <i class="fa-solid fa-circle-exclamation modal-confirm-icon"></i>
+                <h3>Excluir Procedimento?</h3>
+                <p>A lápide será adicionada no arquivo binário.</p>
+                <div class="modal-confirm-actions">
+                    <button class="btn btn-outline" id="btnCancelarExclusaoProc">Cancelar</button>
+                    <button class="btn btn-primary" id="btnConfirmarExclusaoProc"
+                        style="background:#ef4444;border-color:#ef4444;">
+                        Sim, excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MODAIS CONSULTAS ══════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="modalConsulta">
+            <div class="modal modal-lg">
+                <div class="modal-header">
+                    <h2 id="modalConsultaTitle"><i class="fa-solid fa-calendar-plus"></i> Nova Consulta</h2>
+                    <button class="btn-close" id="btnFecharModalConsulta"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formConsulta">
+                        <input type="hidden" id="consultaId">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label for="consultaDataHora">Data e Hora</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <input type="datetime-local" id="consultaDataHora" required>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="consultaStatus">Status</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-circle-dot"></i>
+                                    <select id="consultaStatus" required>
+                                        <option value="" disabled selected>Selecione</option>
+                                        <option value="Marcada">Marcada</option>
+                                        <option value="Realizada">Realizada</option>
+                                        <option value="Cancelada">Cancelada</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group full-width">
+                                <label for="consultaPaciente">Paciente</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-user"></i>
+                                    <select id="consultaPaciente" required>
+                                        <option value="" disabled selected>Selecione o paciente</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group full-width">
+                                <label for="consultaMedico">Médico Responsável</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-user-doctor"></i>
+                                    <select id="consultaMedico" required>
+                                        <option value="" disabled selected>Selecione o médico</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group full-width">
+                                <label>Procedimentos</label>
+                                <div class="alergia-add-box" style="align-items:flex-start;flex-wrap:wrap;gap:8px;">
+                                    <select id="consultaProcSelect"
+                                        style="flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;outline:none;">
+                                        <option value="" disabled selected>Selecionar procedimento</option>
+                                    </select>
+                                    <input type="text" id="consultaProcObs" placeholder="Observação (opcional)"
+                                        style="flex:1;min-width:160px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;outline:none;">
+                                    <button type="button" class="btn btn-secondary" id="btnAdicionarProcConsulta">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="tags-container" id="procsSelecionados" style="margin-top:10px;">
+                                    <p class="text-muted" style="font-size:.85rem;">Nenhum procedimento adicionado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="btnCancelarModalConsulta">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="formConsulta">
+                        <i class="fa-solid fa-save"></i> Gravar no Arquivo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Ver Consulta -->
+        <div class="modal-overlay" id="modalVerConsulta">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2><i class="fa-solid fa-eye"></i> Detalhes da Consulta</h2>
+                    <button class="btn-close" id="btnFecharVerConsulta"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body" id="verConsultaConteudo"></div>
+            </div>
+        </div>
+
+        <div class="modal-confirm-overlay" id="modalConfirmacaoConsulta">
+            <div class="modal-confirm">
+                <i class="fa-solid fa-circle-exclamation modal-confirm-icon"></i>
+                <h3>Excluir Consulta?</h3>
+                <p>Os procedimentos vinculados também serão removidos.</p>
+                <div class="modal-confirm-actions">
+                    <button class="btn btn-outline" id="btnCancelarExclusaoConsulta">Cancelar</button>
+                    <button class="btn btn-primary" id="btnConfirmarExclusaoConsulta"
+                        style="background:#ef4444;border-color:#ef4444;">
+                        Sim, excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MODAIS USUÁRIOS ═══════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="modalUsuario">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modalUsuarioTitle"><i class="fa-solid fa-user-plus"></i> Novo Usuário</h2>
+                    <button class="btn-close" id="btnFecharModalUsuario"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formUsuario">
+                        <input type="hidden" id="usuarioId">
+                        <div class="form-grid">
+                            <div class="input-group full-width">
+                                <label for="usuarioNome">Nome Completo</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-regular fa-user"></i>
+                                    <input type="text" id="usuarioNome" placeholder="Nome do usuário" required>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="usuarioCpf">CPF</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-regular fa-id-card"></i>
+                                    <input type="text" id="usuarioCpf" placeholder="00000000000" maxlength="11"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="usuarioEmail">E-mail</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-regular fa-envelope"></i>
+                                    <input type="email" id="usuarioEmail" placeholder="email@exemplo.com" required>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="usuarioPapel">Perfil</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-user-tag"></i>
+                                    <select id="usuarioPapel" required>
+                                        <option value="" disabled selected>Selecione</option>
+                                        <option value="Médico">Médico</option>
+                                        <option value="Enfermeiro">Enfermeiro</option>
+                                        <option value="Recepcionista">Recepcionista</option>
+                                        <option value="Administrador">Administrador</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group" id="divEspUsuario" style="display:none">
+                                <label for="usuarioEspecialidade">Especialidade</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-stethoscope"></i>
+                                    <input type="text" id="usuarioEspecialidade" placeholder="Ex: Cardiologia">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="usuarioSenha">Senha <span id="senhaDica"
+                                        style="font-weight:400;color:var(--text-muted)">(deixe vazio para
+                                        manter)</span></label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <input type="password" id="usuarioSenha" placeholder="••••••••">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="btnCancelarModalUsuario">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="formUsuario">
+                        <i class="fa-solid fa-save"></i> Gravar no Arquivo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-confirm-overlay" id="modalConfirmacaoUsuario">
+            <div class="modal-confirm">
+                <i class="fa-solid fa-circle-exclamation modal-confirm-icon"></i>
+                <h3>Excluir Usuário?</h3>
+                <p>O acesso deste usuário ao sistema será removido.</p>
+                <div class="modal-confirm-actions">
+                    <button class="btn btn-outline" id="btnCancelarExclusaoUsuario">Cancelar</button>
+                    <button class="btn btn-primary" id="btnConfirmarExclusaoUsuario"
+                        style="background:#ef4444;border-color:#ef4444;">
+                        Sim, excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MODAL EDITAR PERFIL ═══════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="modalEditarPerfil">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2><i class="fa-solid fa-user-pen"></i> Editar Meu Perfil</h2>
+                    <button class="btn-close" id="btnFecharModalPerfil"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarPerfil">
+                        <div class="input-group">
+                            <label for="editPerfilNome">Nome Completo</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-user"></i>
+                                <input type="text" id="editPerfilNome" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="editPerfilEmail">E-mail</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-envelope"></i>
+                                <input type="email" id="editPerfilEmail" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="editPerfilCpf">CPF</label>
+                            <div class="input-with-icon">
+                                <i class="fa-regular fa-id-card"></i>
+                                <input type="text" id="editPerfilCpf" maxlength="11">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="editPerfilSenha">Nova Senha <span
+                                    style="font-weight:400;color:var(--text-muted)">(deixe vazio para
+                                    manter)</span></label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="editPerfilSenha" placeholder="Nova senha">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="editPerfilConfirmaSenha">Confirmar Nova Senha</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="editPerfilConfirmaSenha" placeholder="Confirme a nova senha">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="btnCancelarPerfil">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" form="formEditarPerfil">
+                        <i class="fa-solid fa-save"></i> Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- fim #telaApp -->
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/services/usuario-api.js"></script>
+    <script src="js/services/paciente-api.js"></script>
+    <script src="js/services/procedimento-api.js"></script>
+    <script src="js/services/consulta-api.js"></script>
+    <script src="js/ui/toast.js"></script>
+    <script src="js/controllers/auth-controller.js"></script>
+    <script src="js/controllers/paciente-controller.js"></script>
+    <script src="js/controllers/procedimento-controller.js"></script>
+    <script src="js/controllers/consulta-controller.js"></script>
+    <script src="js/controllers/usuario-controller.js"></script>
+    <script src="js/ui/layout.js"></script>
+</body>
+
+</html>
