@@ -660,3 +660,14 @@ td {
   display: flex;
   gap: 4px;
 }
+/* ── Botões dentro do form (modal-footer-inside) ─────────────────────────── */
+.modal-footer-inside {
+  padding: 18px 25px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f8fafc;
+  border-radius: 0 0 12px 12px;
+  margin: 0 -25px -25px -25px;
+}

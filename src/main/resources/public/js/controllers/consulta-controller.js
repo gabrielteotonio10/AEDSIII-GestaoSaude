@@ -287,7 +287,9 @@ document
   .getElementById("formConsulta")
   ?.addEventListener("submit", async function (e) {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
+    const btn =
+      document.getElementById("btnSalvarConsulta") ||
+      e.target.querySelector('button[type="submit"]');
     const idInput = document.getElementById("consultaId").value;
     const dataInput = document.getElementById("consultaDataHora").value;
     const dataHora = dataInput ? new Date(dataInput).getTime() : Date.now();

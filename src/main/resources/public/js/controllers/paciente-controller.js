@@ -160,7 +160,9 @@ document
   .getElementById("formPaciente")
   ?.addEventListener("submit", async function (e) {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
+    const btn =
+      document.getElementById("btnSalvarPaciente") ||
+      e.target.querySelector('button[type="submit"]');
     const idInput = document.getElementById("pacienteId").value;
     const paciente = {
       nome: document.getElementById("nome").value,
@@ -195,6 +197,7 @@ document
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-save"></i> Gravar no Arquivo';
+      btn.disabled = false;
     }
   });
 

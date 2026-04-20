@@ -117,7 +117,9 @@ document
   .getElementById("formUsuario")
   ?.addEventListener("submit", async function (e) {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
+    const btn =
+      document.getElementById("btnSalvarUsuario") ||
+      e.target.querySelector('button[type="submit"]');
     const idInput = document.getElementById("usuarioId").value;
     const usuario = {
       nome: document.getElementById("usuarioNome").value,

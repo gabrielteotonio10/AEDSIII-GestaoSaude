@@ -1,45 +1,28 @@
-// ── usuario-api.js ────────────────────────────────────────────────────────────
-
-function cadastrarUsuarioNoJava(usuario) {
-  return fetch("/usuarios", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(usuario),
-  });
-}
-
-function logarNoJava(email, senha) {
-  return fetch("/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: email, senha: senha }),
-  });
-}
-
-function listarUsuariosNoJava() {
-  return fetch("/usuarios", { headers: { "Cache-Control": "no-cache" } }).then(
-    function (r) {
-      if (!r.ok) throw new Error("Erro ao listar");
-      return r.json();
-    },
-  );
-}
-
-function buscarUsuarioPorIdNoJava(id) {
-  return fetch("/usuarios/" + id).then(function (r) {
-    if (!r.ok) throw new Error("Não encontrado");
-    return r.json();
-  });
-}
-
-function atualizarUsuarioNoJava(id, usuario) {
-  return fetch("/usuarios/" + id, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(usuario),
-  });
-}
-
-function excluirUsuarioNoJava(id) {
-  return fetch("/usuarios/" + id, { method: "DELETE" });
+// ── toast.js ──────────────────────────────────────────────────────────────────
+function mostrarNotificacao(mensagem, tipo) {
+  tipo = tipo || "sucesso";
+  var container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
+  var toast = document.createElement("div");
+  toast.className = "toast " + tipo;
+  var icones = {
+    sucesso: "fa-circle-check",
+    erro: "fa-circle-exclamation",
+    aviso: "fa-triangle-exclamation",
+  };
+  toast.innerHTML =
+    '<i class="fa-solid ' +
+    (icones[tipo] || "fa-circle-check") +
+    '"></i> <span>' +
+    mensagem +
+    "</span>";
+  container.appendChild(toast);
+  setTimeout(function () {
+    toast.remove();
+  }, 3500);
 }

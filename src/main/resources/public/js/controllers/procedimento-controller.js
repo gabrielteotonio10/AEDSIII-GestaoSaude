@@ -89,7 +89,9 @@ document
   .getElementById("formProcedimento")
   ?.addEventListener("submit", async function (e) {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
+    const btn =
+      document.getElementById("btnSalvarProcedimento") ||
+      e.target.querySelector('button[type="submit"]');
     const idInput = document.getElementById("procedimentoId").value;
     const proc = {
       nomeExame: document.getElementById("procNome").value,
