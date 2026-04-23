@@ -5,10 +5,9 @@ target/
 *.war
 *.ear
 
-# --- JDK & Runtimes (CUIDADO: Isso causou seu erro) ---
-.jdk/
-jdk*/
-java*/
+# --- JDK & Runtimes (Apenas na raiz) ---
+/.jdk/
+/jdk*/
 *.zip
 *.tar.gz
 *.msi
@@ -28,6 +27,4 @@ Thumbs.db
 .DS_Store
 
 # --- Dados do Banco Binário (AEDS III) ---
-data/
-*.db
 *.index
