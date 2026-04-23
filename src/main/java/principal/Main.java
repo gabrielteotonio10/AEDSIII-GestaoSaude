@@ -159,6 +159,11 @@ public class Main {
         app.delete("/pacientes/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
+                ConsultaDAO consultaDAO = new ConsultaDAO();
+                if (consultaDAO.pacientePossuiConsultas(id)) {
+                    ctx.status(409).result("Paciente possui consultas vinculadas.");
+                    return;
+                }
                 boolean ok = new PacienteDAO().excluir(id);
                 if (ok)
                     ctx.status(200).result("Excluído.");
@@ -234,6 +239,14 @@ public class Main {
         app.post("/consultas", ctx -> {
             try {
                 Consulta c = ctx.bodyAsClass(Consulta.class);
+                if (new PacienteDAO().buscar(c.getIdPaciente()) == null) {
+                    ctx.status(404).result("Paciente não encontrado.");
+                    return;
+                }
+                if (new UsuarioDAO().buscar(c.getIdUsuario()) == null) {
+                    ctx.status(404).result("Usuário não encontrado.");
+                    return;
+                }
                 int id = new ConsultaDAO().incluir(c);
                 ctx.status(201).result("Consulta criada com ID " + id);
             } catch (Exception e) {
@@ -277,6 +290,14 @@ public class Main {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 Consulta c = ctx.bodyAsClass(Consulta.class);
                 c.setId(id);
+                if (new PacienteDAO().buscar(c.getIdPaciente()) == null) {
+                    ctx.status(404).result("Paciente não encontrado.");
+                    return;
+                }
+                if (new UsuarioDAO().buscar(c.getIdUsuario()) == null) {
+                    ctx.status(404).result("Usuário não encontrado.");
+                    return;
+                }
                 boolean ok = new ConsultaDAO().alterar(c);
                 if (ok)
                     ctx.status(200).result("Atualizado!");
@@ -326,6 +347,19 @@ public class Main {
             try {
                 int idConsulta = Integer.parseInt(ctx.pathParam("idConsulta"));
                 ctx.json(new ConsultaProcedimentoDAO().listarPorConsulta(idConsulta));
+            } catch (Exception e) {
+                ctx.status(500).result("Erro: " + e.getMessage());
+            }
+        });
+
+        app.get("/consulta_procedimentos/{id}", ctx -> {
+            try {
+                int id = Integer.parseInt(ctx.pathParam("id"));
+                ConsultaProcedimento cp = new ConsultaProcedimentoDAO().buscar(id);
+                if (cp != null)
+                    ctx.json(cp);
+                else
+                    ctx.status(404).result("Não encontrado.");
             } catch (Exception e) {
                 ctx.status(500).result("Erro: " + e.getMessage());
             }

@@ -45,6 +45,13 @@ function listarProcedimentosDaConsultaNoJava(idConsulta) {
   });
 }
 
+function buscarProcedimentoConsultaPorIdNoJava(id) {
+  return fetch(`/consulta_procedimentos/${id}`).then((r) => {
+    if (!r.ok) throw new Error("Nao encontrado");
+    return r.json();
+  });
+}
+
 function vincularProcedimentoConsultaNoJava(
   idConsulta,
   idProcedimento,

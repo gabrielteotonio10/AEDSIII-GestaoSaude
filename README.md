@@ -1,64 +1,123 @@
-# 🏥 Sistema de Gestão de Consultas e Exames - TP AEDS III
+# Sistema de Gestao de Consultas e Exames
 
-**Pontifícia Universidade Católica de Minas Gerais (PUC Minas)** **Instituto de Ciências Exatas e Informática** **Disciplina:** Algoritmos e Estruturas de Dados III (AED III)
+Trabalho pratico da disciplina de Algoritmos e Estruturas de Dados III, com persistencia em arquivos binarios e implementacao manual de estruturas de indice, sem uso de SGBD.
 
----
+## Integrantes
 
-## 👥 Integrantes do Grupo
-* Gabriel Teotônio de Castro Coelho Costa
-* Thales Duque Câmara
-* Tiago Delgado Rocha
-* Henrique Amorim Soares
-* Lucas Gontijo Riani
+- Gabriel Teotonio de Castro Coelho Costa
+- Thales Duque Camara
+- Tiago Delgado Rocha
+- Henrique Amorim Soares
+- Lucas Gontijo Riani
 
----
+## Visao Geral
 
-## 📌 Sobre o Projeto
-Este projeto é um aplicativo minimalista para o registro e gerenciamento de atendimentos em uma pequena clínica de saúde. O objetivo principal é desenvolver um sistema robusto de backend que realize operações de CRUD aplicando conceitos avançados de estruturas de dados e armazenamento direto em memória secundária (arquivos binários), **sem o uso de Sistemas Gerenciadores de Bancos de Dados (SGBDs)**.
+O sistema foi desenvolvido para gerenciar atendimentos de uma clinica de saude. A aplicacao realiza operacoes de cadastro, busca, alteracao e exclusao logica das entidades do dominio, mantendo os dados persistidos em disco entre execucoes.
 
-[cite_start]O sistema segue a arquitetura **MVC + DAO**[cite: 35], garantindo a separação de responsabilidades entre as regras de negócio, a representação em memória e a persistência em disco.
+O projeto foi organizado com foco em separacao de responsabilidades:
 
----
+- `model`: classes de entidade e serializacao dos registros
+- `dao`: acesso aos arquivos, indices e regras de persistencia
+- `principal`: inicializacao da API e execucao da aplicacao
+- `src/main/resources/public`: front-end web estatico
 
-## ⚙️ Modelagem de Dados
-O domínio do problema exige relacionamentos complexos e campos específicos, modelados da seguinte forma:
+## Entidades do Projeto
 
-* **`Usuario`**: Responsável pela autenticação do sistema (Recepcionistas/Administradores).
-* **`Paciente`**: Entidade principal contendo dados básicos e um **campo string multivalorado** (Lista de Alergias/Telefones).
-* **`Consulta`**: Entidade que registra o atendimento. Possui relacionamento **1:N** com Paciente (um paciente tem várias consultas).
-* **`Exame`**: Catálogo de exames disponíveis.
-* **`Consulta_Exame`**: Tabela intermediária para modelar o relacionamento **N:N** (uma consulta tem vários exames, e um exame pode pertencer a várias consultas).
+- `Usuario`: profissionais e administradores do sistema
+- `Paciente`: cadastro do paciente com atributo multivalorado de alergias
+- `Consulta`: atendimento vinculado a paciente e usuario
+- `Procedimento`: catalogo de procedimentos e exames
+- `ConsultaProcedimento`: entidade associativa entre consulta e procedimento
 
----
+## Funcionalidades Implementadas
 
-## 🚀 Requisitos e Funcionalidades Técnicas
-O desenvolvimento está sendo dividido em fases, contemplando a implementação 100% manual (via código Java) das seguintes estruturas:
+- CRUD completo de `Usuario`, `Paciente`, `Consulta`, `Procedimento` e `ConsultaProcedimento`
+- Persistencia em arquivos binarios `.db`
+- Exclusao logica com lapide
+- Reutilizacao de espaco de registros removidos logicamente
+- Indice primario por chave primaria com Hash Extensivel
+- Relacionamento `Paciente 1:N Consulta` com Hash Extensivel
+- Validacao de chaves inexistentes e conflitos basicos de integridade
+- API HTTP em Java com Javalin
+- Front-end web para operacao do sistema
 
-### Fase 1: Persistência Básica (Atual)
-- [x] [cite_start]CRUD completo de registros[cite: 12].
-- [x] [cite_start]Armazenamento em arquivos binários (`.db`)[cite: 13, 27].
-- [x] [cite_start]Gerenciamento de Cabeçalho (controle do último ID inserido)[cite: 10].
-- [x] [cite_start]Controle de exclusão lógica de registros utilizando **Lápide**[cite: 10, 13, 21].
-- [x] Interface temporária via Console para validação lógica.
+## Tecnologias Utilizadas
 
-### Fases Futuras (A Implementar)
-- [ ] **Indexação Externa:** Implementação de **Árvore B+** e **Hash Extensível** para buscas eficientes (ex: busca por CPF ou ID do Paciente).
-- [ ] **Pesquisa Textual:** Algoritmos de casamento de padrões (**Boyer-Moore** ou **KMP**) no campo de diagnóstico da Consulta.
-- [ ] **Segurança:** Autenticação de usuários com senhas protegidas via **Criptografia XOR**.
-- [ ] **Otimização de Espaço:** Algoritmos de compactação e descompactação de dados (**Huffman** e **LZW**).
-- [ ] [cite_start]**Interface Gráfica:** Substituição do Console por uma interface mínima web em **HTML/CSS**[cite: 25, 26, 39].
+- Java 21
+- Maven
+- Javalin
+- Jackson
+- HTML, CSS e JavaScript
 
----
+## Estrutura de Persistencia
 
-## 📁 Estrutura do Repositório
-Para facilitar a navegação e respeitar o padrão MVC, o projeto está organizado da seguinte maneira:
+Os dados sao gravados em disco dentro da pasta `data/`.
+
+- `data/usuarios/usuarios.db`
+- `data/pacientes/pacientes.db`
+- `data/consultas/consultas.db`
+- `data/procedimentos/procedimentos.db`
+- `data/consulta_procedimentos/consulta_procedimentos.db`
+- `data/indices/` para os arquivos de indice
+
+## Compilacao e Execucao
+
+### Pre-requisitos
+
+- Java 21
+- Maven 3.9 ou superior
+
+### Compilar o projeto
+
+```bash
+mvn clean compile
+```
+
+### Executar a aplicacao
+
+```bash
+mvn exec:java -Dexec.mainClass=principal.Main
+```
+
+Tambem e possivel executar diretamente a classe `principal.Main` pela IDE.
+
+## Acesso
+
+Com a aplicacao em execucao:
+
+- API e front-end: `http://localhost:8080`
+
+## Testes Basicos
+
+Os CRUDs podem ser testados por meio das rotas HTTP usando Postman, Insomnia ou ferramenta equivalente.
+
+Principais recursos expostos:
+
+- `/usuarios`
+- `/pacientes`
+- `/consultas`
+- `/procedimentos`
+- `/consulta_procedimentos`
+
+## Documentacao Tecnica
+
+O detalhamento da persistencia, dos indices e das decisoes de projeto esta em:
+
+- [docs/documentacao-tecnica.md](docs/documentacao-tecnica.md)
+
+## Estrutura do Repositorio
 
 ```text
 /
-├── src/
-│   ├── model/       # Classes de entidade (Paciente, Consulta, etc.)
-│   ├── dao/         # Classes de persistência em arquivos binários (File Access)
-│   ├── controller/  # Regras de negócio e mediação
-│   └── view/        # Interface de interação com o usuário
-├── data/            # Diretório ignorado pelo Git (armazena os arquivos .db localmente)
-└── docs/            # Documentação técnica (DCU, DER, Arquitetura)
+|-- src/
+|   |-- main/java/model/
+|   |-- main/java/dao/
+|   |-- main/java/principal/
+|   `-- main/resources/public/
+|-- data/
+`-- docs/
+```
+
+## Observacoes Finais
+
+O projeto foi desenvolvido sem banco de dados relacional, utilizando exclusivamente arquivos binarios, indices persistidos em disco e estruturas de dados implementadas manualmente para atender aos requisitos da disciplina.
