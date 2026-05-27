@@ -48,13 +48,8 @@ public class Arquivo<T extends Registro> {
         obj.setId(novoID);
 
         byte[] dados = obj.toByteArray();
-        long endereco = getDeleted(dados.length);
-        if (endereco == -1) {
-            arquivo.seek(arquivo.length());
-            endereco = arquivo.getFilePointer();
-        } else {
-            arquivo.seek(endereco);
-        }
+        arquivo.seek(arquivo.length());
+        long endereco = arquivo.getFilePointer();
 
         arquivo.writeByte(' ');
         arquivo.writeShort(dados.length);
@@ -72,6 +67,9 @@ public class Arquivo<T extends Registro> {
         arquivo.seek(endereco);
         byte lapide = arquivo.readByte();
         short tamanho = arquivo.readShort();
+        if (tamanho <= 0 || arquivo.getFilePointer() + tamanho > arquivo.length()) {
+            return null;
+        }
         byte[] dados = new byte[tamanho];
         arquivo.read(dados);
         if (lapide != ' ') {
@@ -85,16 +83,40 @@ public class Arquivo<T extends Registro> {
 
     public java.util.List<T> readAll() throws Exception {
         java.util.List<T> lista = new java.util.ArrayList<>();
+        java.util.Set<Integer> idsLidos = new java.util.HashSet<>();
+
         arquivo.seek(TAM_CABECALHO);
         while (arquivo.getFilePointer() < arquivo.length()) {
+            long posicao = arquivo.getFilePointer();
+            if (arquivo.length() - posicao < 3) {
+                break;
+            }
             byte lapide = arquivo.readByte();
             short tamanho = arquivo.readShort();
+            if (tamanho <= 0 || arquivo.getFilePointer() + tamanho > arquivo.length()) {
+                break;
+            }
             byte[] dados = new byte[tamanho];
             arquivo.read(dados);
             if (lapide == ' ') {
                 T obj = construtor.newInstance();
                 obj.fromByteArray(dados);
-                lista.add(obj);
+                if (idsLidos.add(obj.getId())) {
+                    lista.add(obj);
+                }
+            }
+        }
+
+        // Recupera registros ainda acessiveis pelo indice primario quando o arquivo
+        // contem sobras de reaproveitamento antigo que impedem a varredura completa.
+        arquivo.seek(0);
+        int ultimoID = arquivo.readInt();
+        for (int id = 1; id <= ultimoID; id++) {
+            if (!idsLidos.contains(id)) {
+                T obj = read(id);
+                if (obj != null && idsLidos.add(obj.getId())) {
+                    lista.add(obj);
+                }
             }
         }
         return lista;
@@ -145,13 +167,8 @@ public class Arquivo<T extends Registro> {
         arquivo.writeByte('*');
         addDeleted(tamanho, posicao);
 
-        long novoEndereco = getDeleted(novosDados.length);
-        if (novoEndereco == -1) {
-            arquivo.seek(arquivo.length());
-            novoEndereco = arquivo.getFilePointer();
-        } else {
-            arquivo.seek(novoEndereco);
-        }
+        arquivo.seek(arquivo.length());
+        long novoEndereco = arquivo.getFilePointer();
 
         arquivo.writeByte(' ');
         arquivo.writeShort(novoTam);

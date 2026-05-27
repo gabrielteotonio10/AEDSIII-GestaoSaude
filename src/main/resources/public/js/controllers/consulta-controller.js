@@ -35,13 +35,13 @@ function statusBadge(status) {
 async function carregarSelects() {
   try {
     const [pacs, usrs, procs] = await Promise.all([
-      fetch("/pacientes").then(function (r) {
+      fetch("/pacientes", { headers: { "Cache-Control": "no-cache" } }).then(function (r) {
         return r.json();
       }),
-      fetch("/usuarios").then(function (r) {
+      fetch("/usuarios", { headers: { "Cache-Control": "no-cache" } }).then(function (r) {
         return r.json();
       }),
-      fetch("/procedimentos").then(function (r) {
+      fetch("/procedimentos", { headers: { "Cache-Control": "no-cache" } }).then(function (r) {
         return r.json();
       }),
     ]);
@@ -190,6 +190,8 @@ document
   ?.addEventListener("click", async function () {
     fecharModalConsulta();
     await carregarSelects();
+    listaProcedimentosSelecionados = [];
+    renderizarListaProcs();
     document.getElementById("modalConsulta")?.classList.add("active");
   });
 

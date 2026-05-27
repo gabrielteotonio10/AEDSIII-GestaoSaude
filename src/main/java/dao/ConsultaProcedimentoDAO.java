@@ -17,7 +17,11 @@ public class ConsultaProcedimentoDAO {
     }
 
     public int incluir(ConsultaProcedimento cp) throws Exception {
-        if (indice.buscarIdVinculo(cp.getIdConsulta(), cp.getIdProcedimento()) != -1) {
+        long idIndexado = indice.buscarIdVinculo(cp.getIdConsulta(), cp.getIdProcedimento());
+        if (idIndexado != -1 && arquivo.read((int) idIndexado) != null) {
+            throw new IllegalArgumentException("Procedimento ja vinculado a esta consulta.");
+        }
+        if (existeVinculoAtivo(cp.getIdConsulta(), cp.getIdProcedimento())) {
             throw new IllegalArgumentException("Procedimento ja vinculado a esta consulta.");
         }
         int id = arquivo.create(cp);
@@ -31,10 +35,19 @@ public class ConsultaProcedimentoDAO {
 
     public ConsultaProcedimento buscarPorChaveComposta(int idConsulta, int idProcedimento) throws Exception {
         long id = indice.buscarIdVinculo(idConsulta, idProcedimento);
-        if (id == -1) {
-            return null;
+        if (id != -1) {
+            ConsultaProcedimento cp = arquivo.read((int) id);
+            if (cp != null) {
+                return cp;
+            }
         }
-        return arquivo.read((int) id);
+
+        for (ConsultaProcedimento cp : arquivo.readAll()) {
+            if (cp.getIdConsulta() == idConsulta && cp.getIdProcedimento() == idProcedimento) {
+                return cp;
+            }
+        }
+        return null;
     }
 
     public List<ConsultaProcedimento> listarTodos() throws Exception {
@@ -85,6 +98,13 @@ public class ConsultaProcedimentoDAO {
                 filtrados.add(cp);
             }
         }
+        if (filtrados.isEmpty()) {
+            for (ConsultaProcedimento cp : arquivo.readAll()) {
+                if (cp.getIdConsulta() == idConsulta) {
+                    filtrados.add(cp);
+                }
+            }
+        }
         return filtrados;
     }
 
@@ -94,6 +114,13 @@ public class ConsultaProcedimentoDAO {
             ConsultaProcedimento cp = arquivo.read(idVinculo);
             if (cp != null) {
                 filtrados.add(cp);
+            }
+        }
+        if (filtrados.isEmpty()) {
+            for (ConsultaProcedimento cp : arquivo.readAll()) {
+                if (cp.getIdProcedimento() == idProcedimento) {
+                    filtrados.add(cp);
+                }
             }
         }
         return filtrados;
@@ -108,5 +135,14 @@ public class ConsultaProcedimentoDAO {
         for (ConsultaProcedimento cp : lista) {
             excluir(cp.getId());
         }
+    }
+
+    private boolean existeVinculoAtivo(int idConsulta, int idProcedimento) throws Exception {
+        for (ConsultaProcedimento cp : arquivo.readAll()) {
+            if (cp.getIdConsulta() == idConsulta && cp.getIdProcedimento() == idProcedimento) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -83,7 +83,7 @@ document
   });
 
 // ── Tabela ────────────────────────────────────────────────────────────────────
-async function atualizarTabelaProcedimentos(ordenarPorNome = false) {
+window.atualizarTabelaProcedimentos = async function (ordenarPorNome = false) {
   const corpo = document.getElementById("listaProcedimentos");
   if (!corpo) return;
 
@@ -138,9 +138,19 @@ async function atualizarTabelaProcedimentos(ordenarPorNome = false) {
       mediaEl.innerText = "R$ " + media.toFixed(2).replace(".", ",");
     }
   } catch (err) {
+    console.error("Erro ao carregar procedimentos:", err);
+    corpo.innerHTML =
+      '<tr><td colspan="4" style="text-align:center">Erro ao carregar procedimentos.</td></tr>';
     mostrarNotificacao("Erro ao carregar procedimentos.", "erro");
   }
-}
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  const secao = document.getElementById("section-procedimentos");
+  if (secao && secao.classList.contains("active")) {
+    window.atualizarTabelaProcedimentos();
+  }
+});
 
 // ── Criar / Editar ────────────────────────────────────────────────────────────
 document

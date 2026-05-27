@@ -66,8 +66,12 @@ function verificarAutenticacao() {
     telaLogin.style.display = "none";
     telaApp.style.display = "block";
     preencherDadosUsuario(usuario);
-    if (typeof atualizarTabelaPacientes === "function")
+    const secaoAtiva = document.querySelector(".crud-section.active");
+    if (secaoAtiva && typeof carregarSecao === "function") {
+      carregarSecao(secaoAtiva.id);
+    } else if (typeof atualizarTabelaPacientes === "function") {
       atualizarTabelaPacientes();
+    }
   } else {
     telaLogin.style.display = "block";
     telaApp.style.display = "none";
