@@ -9,6 +9,15 @@ function listarProcedimentosNoJava() {
   });
 }
 
+function listarProcedimentosOrdenadosPorNomeNoJava() {
+  return fetch("/procedimentos/ordenado/nome", {
+    headers: { "Cache-Control": "no-cache" },
+  }).then((r) => {
+    if (!r.ok) throw new Error("Erro ao listar");
+    return r.json();
+  });
+}
+
 function buscarProcedimentoPorIdNoJava(id) {
   return fetch(`/procedimentos/${id}`).then((r) => {
     if (!r.ok) throw new Error("Não encontrado");
@@ -34,4 +43,13 @@ function atualizarProcedimentoNoJava(id, proc) {
 
 function excluirProcedimentoNoJava(id) {
   return fetch(`/procedimentos/${id}`, { method: "DELETE" });
+}
+
+function listarConsultasDoProcedimentoNoJava(idProcedimento) {
+  return fetch(`/consulta_procedimentos/procedimento/${idProcedimento}`).then(
+    (r) => {
+      if (!r.ok) throw new Error("Erro");
+      return r.json();
+    },
+  );
 }

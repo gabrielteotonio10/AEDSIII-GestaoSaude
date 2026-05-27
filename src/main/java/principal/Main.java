@@ -193,6 +193,14 @@ public class Main {
             }
         });
 
+        app.get("/procedimentos/ordenado/nome", ctx -> {
+            try {
+                ctx.json(new ProcedimentoDAO().listarOrdenadoPorNome());
+            } catch (Exception e) {
+                ctx.status(500).result("Erro: " + e.getMessage());
+            }
+        });
+
         app.get("/procedimentos/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
@@ -224,6 +232,10 @@ public class Main {
         app.delete("/procedimentos/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
+                if (new ConsultaProcedimentoDAO().procedimentoPossuiConsultas(id)) {
+                    ctx.status(409).result("Procedimento possui consultas vinculadas.");
+                    return;
+                }
                 boolean ok = new ProcedimentoDAO().excluir(id);
                 if (ok)
                     ctx.status(200).result("Excluído.");
@@ -327,8 +339,18 @@ public class Main {
         app.post("/consulta_procedimentos", ctx -> {
             try {
                 ConsultaProcedimento cp = ctx.bodyAsClass(ConsultaProcedimento.class);
+                if (new ConsultaDAO().buscar(cp.getIdConsulta()) == null) {
+                    ctx.status(404).result("Consulta nÃ£o encontrada.");
+                    return;
+                }
+                if (new ProcedimentoDAO().buscar(cp.getIdProcedimento()) == null) {
+                    ctx.status(404).result("Procedimento nÃ£o encontrado.");
+                    return;
+                }
                 int id = new ConsultaProcedimentoDAO().incluir(cp);
                 ctx.status(201).result("Vínculo criado com ID " + id);
+            } catch (IllegalArgumentException e) {
+                ctx.status(409).result(e.getMessage());
             } catch (Exception e) {
                 ctx.status(500).result("Erro: " + e.getMessage());
             }
@@ -352,6 +374,30 @@ public class Main {
             }
         });
 
+        app.get("/consulta_procedimentos/procedimento/{idProcedimento}", ctx -> {
+            try {
+                int idProcedimento = Integer.parseInt(ctx.pathParam("idProcedimento"));
+                ctx.json(new ConsultaProcedimentoDAO().listarPorProcedimento(idProcedimento));
+            } catch (Exception e) {
+                ctx.status(500).result("Erro: " + e.getMessage());
+            }
+        });
+
+        app.get("/consulta_procedimentos/consulta/{idConsulta}/procedimento/{idProcedimento}", ctx -> {
+            try {
+                int idConsulta = Integer.parseInt(ctx.pathParam("idConsulta"));
+                int idProcedimento = Integer.parseInt(ctx.pathParam("idProcedimento"));
+                ConsultaProcedimento cp = new ConsultaProcedimentoDAO().buscarPorChaveComposta(idConsulta,
+                        idProcedimento);
+                if (cp != null)
+                    ctx.json(cp);
+                else
+                    ctx.status(404).result("Não encontrado.");
+            } catch (Exception e) {
+                ctx.status(500).result("Erro: " + e.getMessage());
+            }
+        });
+
         app.get("/consulta_procedimentos/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
@@ -370,11 +416,35 @@ public class Main {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 ConsultaProcedimento cp = ctx.bodyAsClass(ConsultaProcedimento.class);
                 cp.setId(id);
+                if (new ConsultaDAO().buscar(cp.getIdConsulta()) == null) {
+                    ctx.status(404).result("Consulta nao encontrada.");
+                    return;
+                }
+                if (new ProcedimentoDAO().buscar(cp.getIdProcedimento()) == null) {
+                    ctx.status(404).result("Procedimento nao encontrado.");
+                    return;
+                }
                 boolean ok = new ConsultaProcedimentoDAO().alterar(cp);
                 if (ok)
                     ctx.status(200).result("Atualizado!");
                 else
                     ctx.status(404).result("Não encontrado.");
+            } catch (IllegalArgumentException e) {
+                ctx.status(409).result(e.getMessage());
+            } catch (Exception e) {
+                ctx.status(500).result("Erro: " + e.getMessage());
+            }
+        });
+
+        app.delete("/consulta_procedimentos/consulta/{idConsulta}/procedimento/{idProcedimento}", ctx -> {
+            try {
+                int idConsulta = Integer.parseInt(ctx.pathParam("idConsulta"));
+                int idProcedimento = Integer.parseInt(ctx.pathParam("idProcedimento"));
+                boolean ok = new ConsultaProcedimentoDAO().excluirPorChaveComposta(idConsulta, idProcedimento);
+                if (ok)
+                    ctx.status(200).result("ExcluÃ­do.");
+                else
+                    ctx.status(404).result("NÃ£o encontrado.");
             } catch (Exception e) {
                 ctx.status(500).result("Erro: " + e.getMessage());
             }

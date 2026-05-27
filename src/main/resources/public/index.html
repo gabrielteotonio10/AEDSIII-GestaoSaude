@@ -428,6 +428,9 @@
                                 <button class="btn btn-secondary" id="btnBuscarProc">Localizar</button>
                             </div>
                             <div class="toolbar-actions">
+                                <button class="btn btn-outline" id="btnOrdenarProcNome" title="Ordenar por nome">
+                                    <i class="fa-solid fa-arrow-down-a-z"></i>
+                                </button>
                                 <button class="btn btn-outline" id="btnRecarregarProc" title="Atualizar">
                                     <i class="fa-solid fa-rotate-right"></i>
                                 </button>
@@ -641,6 +644,19 @@
         </div>
 
         <!-- ══ MODAIS CONSULTAS ══════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="modalVerProcConsultas">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2><i class="fa-solid fa-calendar-check"></i> Consultas do Procedimento</h2>
+                    <button class="btn-close" id="btnFecharVerProcConsultas"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <p class="label" id="verProcConsultasTitulo"></p>
+                    <div id="verProcConsultasConteudo"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal-overlay" id="modalConsulta">
             <div class="modal modal-lg">
                 <div class="modal-header">

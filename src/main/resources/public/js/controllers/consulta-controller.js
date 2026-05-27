@@ -335,12 +335,15 @@ document
 
       // Salva novos vínculos
       await Promise.all(
-        listaProcedimentosSelecionados.map(function (p) {
-          return vincularProcedimentoConsultaNoJava(
+        listaProcedimentosSelecionados.map(async function (p) {
+          const resposta = await vincularProcedimentoConsultaNoJava(
             consultaId,
             p.idProcedimento,
             p.observacao,
           );
+          if (!resposta.ok) {
+            throw new Error(await resposta.text());
+          }
         }),
       );
 

@@ -27,6 +27,10 @@ public class ListaInvertidaConsulta {
         return endereco;
     }
 
+    public void resetar() throws Exception {
+        arquivo.setLength(0);
+    }
+
     public List<Integer> listarIds(long enderecoInicial) throws Exception {
         List<Integer> ids = new ArrayList<>();
         long atual = enderecoInicial;

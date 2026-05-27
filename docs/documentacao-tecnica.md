@@ -2,7 +2,7 @@
 
 ## 1. Introducao
 
-Este documento descreve as principais decisoes de projeto adotadas na implementacao do sistema, com foco em armazenamento dos dados, indices em disco, relacionamento `1:N`, exclusao logica e organizacao geral do repositorio.
+Este documento descreve as principais decisoes de projeto adotadas na implementacao do sistema, com foco em armazenamento dos dados, indices em disco, relacionamento `1:N`, relacionamento `N:N`, consulta ordenada com Arvore B+, exclusao logica e organizacao geral do repositorio.
 
 O sistema foi construindo sem uso de SGBD. Toda a persistencia ocorre por meio de arquivos binarios acessados diretamente pela aplicacao Java.
 
@@ -92,6 +92,17 @@ No relacionamento `1:N`:
 - chave: `idPaciente`
 - valor: ponteiro para o inicio da lista de consultas do paciente
 
+No relacionamento `N:N` entre `Consulta` e `Procedimento`:
+
+- chave primaria composta: `idConsulta + idProcedimento`
+- indice composto: Hash Extensivel com chave `long`
+- indices auxiliares: Hash Extensivel por `idConsulta` e por `idProcedimento`, ambos apontando para listas invertidas em disco
+
+Na consulta ordenada de procedimentos:
+
+- foi utilizada uma Arvore B+ persistida em `data/indices/procedimentos_nome.bplus`
+- as folhas mantem as chaves de nome em ordem e sao percorridas sequencialmente na listagem ordenada
+
 ## 7. Atualizacao e Sincronizacao dos Indices
 
 ### Insercao
@@ -101,6 +112,8 @@ Na insercao:
 - o registro e gravado no arquivo de dados
 - o indice primario recebe o par `id -> endereco`
 - se o registro for `Consulta`, o relacionamento `Paciente -> Consulta` tambem e atualizado
+- se o registro for `ConsultaProcedimento`, o indice da chave composta e os indices dos dois sentidos do relacionamento `N:N` sao atualizados
+- se o registro for `Procedimento`, o indice B+ por nome e reconstruido para refletir a nova ordem
 
 ### Leitura
 
@@ -116,6 +129,8 @@ Na atualizacao:
 - se o novo conteudo couber no mesmo espaco, o endereco e preservado
 - se o registro precisar ser movido, o indice primario e atualizado com o novo endereco
 - no caso de `Consulta`, se houver mudanca de paciente, o relacionamento `1:N` tambem e ajustado
+- no caso de `ConsultaProcedimento`, se houver mudanca em `idConsulta` ou `idProcedimento`, a chave composta antiga e removida e a nova chave e inserida nos indices
+- no caso de `Procedimento`, alteracoes no nome atualizam a Arvore B+ de ordenacao
 
 ### Exclusao
 
@@ -125,6 +140,8 @@ Na exclusao logica:
 - a chave e removida do indice primario
 - o espaco fica disponivel para reutilizacao
 - se for uma `Consulta`, o vinculo com o paciente tambem e removido
+- se for uma `ConsultaProcedimento`, seus vinculos sao removidos do indice composto e dos indices auxiliares
+- nao e permitido excluir um procedimento que ainda possua consultas vinculadas
 
 ## 8. Relacionamento 1:N
 
@@ -156,17 +173,68 @@ O acesso ao relacionamento ocorre assim:
 
 Esse modelo evita percorrer todo o arquivo de consultas para descobrir quais pertencem a um paciente.
 
-## 10. Integridade Referencial
+## 10. Relacionamento N:N
+
+O relacionamento `Consulta N:N Procedimento` foi implementado pela tabela associativa `ConsultaProcedimento`.
+
+Uma consulta pode conter varios procedimentos realizados, e um mesmo procedimento pode aparecer em varias consultas. Por isso, o relacionamento foi representado por uma tabela intermediaria com os campos:
+
+- `idConsulta`
+- `idProcedimento`
+- `observacao`
+
+A chave primaria logica da tabela associativa e composta por:
+
+- `idConsulta`
+- `idProcedimento`
+
+Para manter compatibilidade com a classe generica `Arquivo<T>`, o registro ainda possui um `id` interno. Esse `id` e usado apenas para localizar fisicamente o registro no arquivo, enquanto a regra de unicidade do relacionamento e controlada pelo indice da chave composta.
+
+## 11. Navegacao do Relacionamento N:N
+
+O relacionamento pode ser acessado a partir das duas entidades principais:
+
+- `Consulta -> Procedimentos`: rota `/consulta_procedimentos/consulta/{idConsulta}`
+- `Procedimento -> Consultas`: rota `/consulta_procedimentos/procedimento/{idProcedimento}`
+
+Foram criados tres indices para a associativa:
+
+- Hash Extensivel da chave composta `idConsulta + idProcedimento`, usado para impedir duplicidade e buscar um vinculo especifico
+- Hash Extensivel por `idConsulta`, apontando para uma lista invertida com os vinculos daquela consulta
+- Hash Extensivel por `idProcedimento`, apontando para uma lista invertida com os vinculos daquele procedimento
+
+Essa estrutura evita varredura completa no arquivo `consulta_procedimentos.db` ao navegar pelos dois lados do relacionamento.
+
+## 12. Consulta Ordenada com Arvore B+
+
+A Arvore B+ foi aplicada na tabela `Procedimento` para permitir a listagem de procedimentos em ordem alfabetica pelo nome do exame.
+
+O indice fica persistido em:
+
+- `data/indices/procedimentos_nome.bplus`
+
+A funcionalidade e exposta na interface web pelo botao de ordenacao por nome na tela de procedimentos e pela rota:
+
+- `/procedimentos/ordenado/nome`
+
+Na consulta ordenada, a aplicacao percorre as folhas da Arvore B+ em sequencia e recupera os procedimentos pelos IDs encontrados no indice. Assim, a listagem ordenada nao depende de ordenar a lista em memoria principal no momento da consulta.
+
+## 13. Integridade Referencial
 
 As principais regras de integridade adotadas foram:
 
 - nao criar consulta para paciente inexistente
 - nao criar consulta para usuario inexistente
+- nao criar vinculo `ConsultaProcedimento` para consulta inexistente
+- nao criar vinculo `ConsultaProcedimento` para procedimento inexistente
+- nao permitir dois vinculos com a mesma chave composta `idConsulta + idProcedimento`
 - ao excluir consulta, remover seus vinculos do relacionamento `Paciente -> Consulta`
+- ao excluir consulta, remover tambem seus vinculos com procedimentos
 - ao trocar o paciente de uma consulta, remover o vinculo antigo e criar o novo
 - nao permitir exclusao de paciente que ainda possua consultas vinculadas
+- nao permitir exclusao de procedimento que ainda possua consultas vinculadas
 
-## 11. Estrutura do Projeto no GitHub
+## 14. Estrutura do Projeto no GitHub
 
 O repositorio foi organizado da seguinte forma:
 
@@ -179,7 +247,7 @@ O repositorio foi organizado da seguinte forma:
 
 Essa organizacao preserva separacao entre dominio, persistencia e interface, coerente com a arquitetura adotada.
 
-## 12. Decisoes de Projeto
+## 15. Decisoes de Projeto
 
 As principais decisoes tomadas foram:
 
@@ -188,9 +256,11 @@ As principais decisoes tomadas foram:
 - implementar exclusao logica com lapide para preservar consistencia dos arquivos
 - usar Hash Extensivel no indice primario por permitir crescimento dinamico
 - usar Hash Extensivel tambem no relacionamento `1:N`, associado a lista encadeada, para acesso eficiente aos filhos
+- usar Hash Extensivel no relacionamento `N:N`, pois as consultas principais sao por igualdade de chave
+- usar Arvore B+ na listagem ordenada de procedimentos por nome
 - reconstruir automaticamente os indices quando seus arquivos ainda nao existem
 
-## 13. Respostas ao Formulario
+## 16. Respostas ao Formulario da Fase Anterior
 
 ### a) Qual a estrutura usada para representar os registros?
 
@@ -224,6 +294,6 @@ Os indices sao persistidos em arquivos separados dentro de `data/indices/`. O di
 
 O projeto esta organizado em camadas. As entidades ficam em `model`, a persistencia em `dao`, a inicializacao da aplicacao em `principal`, os arquivos web em `src/main/resources/public`, os dados persistidos em `data` e a documentacao em `docs`. A arquitetura segue a separacao entre dominio, persistencia e interface.
 
-## 14. Conclusao
+## 17. Conclusao
 
-O projeto atende aos requisitos principais da etapa ao combinar persistencia binaria, CRUD completo, exclusao logica, indices primarios baseados em PK e relacionamento `1:N` com Hash Extensivel. A documentacao acima resume as decisoes que sustentam a implementacao e pode ser usada como base direta para o PDF final da entrega.
+O projeto atende aos requisitos principais da etapa ao combinar persistencia binaria, CRUD completo, exclusao logica, indices primarios baseados em PK, relacionamento `1:N`, relacionamento `N:N` com chave composta e consulta ordenada com Arvore B+. A documentacao acima resume as decisoes tecnicas da implementacao atual.

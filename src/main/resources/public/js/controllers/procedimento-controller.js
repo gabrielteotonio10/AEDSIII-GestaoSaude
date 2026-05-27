@@ -29,14 +29,69 @@ document
     atualizarTabelaProcedimentos();
   });
 
+window.verConsultasDoProcedimento = async function (idProcedimento) {
+  try {
+    const [proc, vinculos] = await Promise.all([
+      buscarProcedimentoPorIdNoJava(idProcedimento),
+      listarConsultasDoProcedimentoNoJava(idProcedimento),
+    ]);
+
+    const consultas = await Promise.all(
+      vinculos.map(function (v) {
+        return buscarConsultaPorIdNoJava(v.idConsulta);
+      }),
+    );
+
+    const html =
+      consultas.length > 0
+        ? consultas
+            .map(function (c) {
+              return (
+                "<li><strong>Consulta #" +
+                c.id +
+                "</strong> - " +
+                new Date(c.dataHora).toLocaleString("pt-BR") +
+                " - " +
+                c.status +
+                "</li>"
+              );
+            })
+            .join("")
+        : "<li>Nenhuma consulta vinculada.</li>";
+
+    document.getElementById("verProcConsultasTitulo").textContent =
+      proc.nomeExame;
+    document.getElementById("verProcConsultasConteudo").innerHTML =
+      '<ul style="padding-left:20px;line-height:2">' + html + "</ul>";
+    document.getElementById("modalVerProcConsultas")?.classList.add("active");
+  } catch (err) {
+    mostrarNotificacao("Erro ao carregar consultas do procedimento.", "erro");
+  }
+};
+
+document
+  .getElementById("btnFecharVerProcConsultas")
+  ?.addEventListener("click", function () {
+    document.getElementById("modalVerProcConsultas")?.classList.remove("active");
+  });
+
+document
+  .getElementById("btnOrdenarProcNome")
+  ?.addEventListener("click", function () {
+    document.getElementById("inputBuscaProc").value = "";
+    atualizarTabelaProcedimentos(true);
+  });
+
 // ── Tabela ────────────────────────────────────────────────────────────────────
-async function atualizarTabelaProcedimentos() {
+async function atualizarTabelaProcedimentos(ordenarPorNome = false) {
   const corpo = document.getElementById("listaProcedimentos");
   if (!corpo) return;
 
   try {
-    const procedimentos = await listarProcedimentosNoJava();
-    procedimentos.reverse();
+    const procedimentos = ordenarPorNome
+      ? await listarProcedimentosOrdenadosPorNomeNoJava()
+      : await listarProcedimentosNoJava();
+    if (!ordenarPorNome) procedimentos.reverse();
     corpo.innerHTML = "";
 
     if (procedimentos.length === 0) {
@@ -58,6 +113,9 @@ async function atualizarTabelaProcedimentos() {
         parseFloat(p.preco).toFixed(2).replace(".", ",") +
         "</td>" +
         '<td><div class="actions">' +
+        '<button class="btn-icon" onclick="verConsultasDoProcedimento(' +
+        p.id +
+        ')" title="Ver consultas"><i class="fa-solid fa-calendar-check"></i></button>' +
         '<button class="btn-icon" onclick="editarProcedimento(' +
         p.id +
         ')" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>' +
@@ -209,6 +267,9 @@ document
         parseFloat(p.preco).toFixed(2).replace(".", ",") +
         "</td>" +
         '<td><div class="actions">' +
+        '<button class="btn-icon" onclick="verConsultasDoProcedimento(' +
+        p.id +
+        ')" title="Ver consultas"><i class="fa-solid fa-calendar-check"></i></button>' +
         '<button class="btn-icon" onclick="editarProcedimento(' +
         p.id +
         ')"><i class="fa-solid fa-pen-to-square"></i></button>' +

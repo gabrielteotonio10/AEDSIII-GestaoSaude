@@ -3,28 +3,24 @@ package dao;
 import java.io.File;
 import java.io.RandomAccessFile;
 
-public class HashExtensivelIntLong {
+public class HashExtensivelLongLong {
     private static final int TAM_BUCKET = 4;
     private static final int TAM_CABECALHO_DIRETORIO = 4;
-    private static final int TAM_ENTRADA_BUCKET = 12;
+    private static final int TAM_ENTRADA_BUCKET = 16;
     private static final int TAM_BUCKET_BYTES = 1 + 2 + (TAM_BUCKET * TAM_ENTRADA_BUCKET);
 
     private final RandomAccessFile diretorio;
     private final RandomAccessFile buckets;
-    private final String caminhoDiretorio;
-    private final String caminhoBuckets;
     private boolean novo;
 
-    public HashExtensivelIntLong(String nomeBase) throws Exception {
+    public HashExtensivelLongLong(String nomeBase) throws Exception {
         File pasta = new File("./data/indices");
         if (!pasta.exists()) {
             pasta.mkdirs();
         }
 
-        this.caminhoDiretorio = "./data/indices/" + nomeBase + ".dir";
-        this.caminhoBuckets = "./data/indices/" + nomeBase + ".bkt";
-        this.diretorio = new RandomAccessFile(this.caminhoDiretorio, "rw");
-        this.buckets = new RandomAccessFile(this.caminhoBuckets, "rw");
+        this.diretorio = new RandomAccessFile("./data/indices/" + nomeBase + ".dir", "rw");
+        this.buckets = new RandomAccessFile("./data/indices/" + nomeBase + ".bkt", "rw");
         this.novo = this.diretorio.length() == 0 || this.buckets.length() == 0;
 
         if (this.novo) {
@@ -54,7 +50,7 @@ public class HashExtensivelIntLong {
         novo = false;
     }
 
-    public long buscar(int chave) throws Exception {
+    public long buscar(long chave) throws Exception {
         Bucket bucket = lerBucketPelaChave(chave);
         for (int i = 0; i < bucket.quantidade; i++) {
             if (bucket.chaves[i] == chave) {
@@ -64,7 +60,7 @@ public class HashExtensivelIntLong {
         return -1;
     }
 
-    public void inserirOuAtualizar(int chave, long valor) throws Exception {
+    public void inserirOuAtualizar(long chave, long valor) throws Exception {
         while (true) {
             int profundidadeGlobal = getProfundidadeGlobal();
             int indiceDiretorio = hash(chave, profundidadeGlobal);
@@ -87,11 +83,11 @@ public class HashExtensivelIntLong {
                 return;
             }
 
-            dividirBucket(indiceDiretorio, enderecoBucket, bucket);
+            dividirBucket(enderecoBucket, bucket);
         }
     }
 
-    public boolean remover(int chave) throws Exception {
+    public boolean remover(long chave) throws Exception {
         int indiceDiretorio = hash(chave, getProfundidadeGlobal());
         long enderecoBucket = getEnderecoBucket(indiceDiretorio);
         Bucket bucket = lerBucket(enderecoBucket);
@@ -117,17 +113,15 @@ public class HashExtensivelIntLong {
         buckets.close();
     }
 
-    private Bucket lerBucketPelaChave(int chave) throws Exception {
+    private Bucket lerBucketPelaChave(long chave) throws Exception {
         int indiceDiretorio = hash(chave, getProfundidadeGlobal());
         return lerBucket(getEnderecoBucket(indiceDiretorio));
     }
 
-    private void dividirBucket(int indiceDiretorio, long enderecoBucket, Bucket bucketAntigo) throws Exception {
+    private void dividirBucket(long enderecoBucket, Bucket bucketAntigo) throws Exception {
         int profundidadeGlobal = getProfundidadeGlobal();
         if (bucketAntigo.profundidadeLocal == profundidadeGlobal) {
             duplicarDiretorio();
-            profundidadeGlobal = getProfundidadeGlobal();
-            indiceDiretorio = hash(indiceDiretorio, profundidadeGlobal);
         }
 
         byte novaProfundidadeLocal = (byte) (bucketAntigo.profundidadeLocal + 1);
@@ -144,7 +138,7 @@ public class HashExtensivelIntLong {
             }
         }
 
-        int[] chaves = new int[bucketAntigo.quantidade];
+        long[] chaves = new long[bucketAntigo.quantidade];
         long[] valores = new long[bucketAntigo.quantidade];
         for (int i = 0; i < bucketAntigo.quantidade; i++) {
             chaves[i] = bucketAntigo.chaves[i];
@@ -192,7 +186,7 @@ public class HashExtensivelIntLong {
         }
     }
 
-    private void adicionarNoBucket(Bucket bucket, int chave, long valor) {
+    private void adicionarNoBucket(Bucket bucket, long chave, long valor) {
         bucket.chaves[bucket.quantidade] = chave;
         bucket.valores[bucket.quantidade] = valor;
         bucket.quantidade++;
@@ -225,7 +219,7 @@ public class HashExtensivelIntLong {
         Bucket bucket = new Bucket(buckets.readByte());
         bucket.quantidade = buckets.readShort();
         for (int i = 0; i < TAM_BUCKET; i++) {
-            bucket.chaves[i] = buckets.readInt();
+            bucket.chaves[i] = buckets.readLong();
             bucket.valores[i] = buckets.readLong();
         }
         return bucket;
@@ -236,25 +230,25 @@ public class HashExtensivelIntLong {
         buckets.writeByte(bucket.profundidadeLocal);
         buckets.writeShort(bucket.quantidade);
         for (int i = 0; i < TAM_BUCKET; i++) {
-            buckets.writeInt(bucket.chaves[i]);
+            buckets.writeLong(bucket.chaves[i]);
             buckets.writeLong(bucket.valores[i]);
         }
     }
 
-    private int hash(int chave, int profundidade) {
+    private int hash(long chave, int profundidade) {
         int mascara = (1 << profundidade) - 1;
-        return (chave & 0x7fffffff) & mascara;
+        long misturada = chave ^ (chave >>> 32);
+        return (int) (misturada & 0x7fffffff) & mascara;
     }
 
     private static class Bucket {
         byte profundidadeLocal;
-        short quantidade;
-        int[] chaves = new int[TAM_BUCKET];
+        short quantidade = 0;
+        long[] chaves = new long[TAM_BUCKET];
         long[] valores = new long[TAM_BUCKET];
 
         Bucket(byte profundidadeLocal) {
             this.profundidadeLocal = profundidadeLocal;
-            this.quantidade = 0;
         }
     }
 }
