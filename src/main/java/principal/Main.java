@@ -463,6 +463,58 @@ public class Main {
             }
         });
 
+        // ── BACKUP / RESTAURAR ────────────────────────────────────────────
+        app.post("/backup/huffman", ctx -> {
+            try {
+                dao.GerenciadorBackup.ResultadoCompressao r = dao.GerenciadorBackup.gerarBackupHuffman();
+                ctx.json(java.util.Map.of(
+                        "arquivo", r.caminhoBackup,
+                        "arquivosIncluidos", r.quantidadeArquivos,
+                        "tamanhoOriginalBytes", r.tamanhoOriginalTotal,
+                        "tamanhoComprimidoBytes", r.tamanhoComprimidoTotal,
+                        "taxaCompressaoPct", String.format("%.2f%%", r.taxaCompressao)));
+            } catch (Exception e) {
+                ctx.status(500).result("Erro ao gerar backup Huffman: " + e.getMessage());
+            }
+        });
+
+        app.post("/backup/lzw", ctx -> {
+            try {
+                dao.GerenciadorBackup.ResultadoCompressao r = dao.GerenciadorBackup.gerarBackupLZW();
+                ctx.json(java.util.Map.of(
+                        "arquivo", r.caminhoBackup,
+                        "arquivosIncluidos", r.quantidadeArquivos,
+                        "tamanhoOriginalBytes", r.tamanhoOriginalTotal,
+                        "tamanhoComprimidoBytes", r.tamanhoComprimidoTotal,
+                        "taxaCompressaoPct", String.format("%.2f%%", r.taxaCompressao)));
+            } catch (Exception e) {
+                ctx.status(500).result("Erro ao gerar backup LZW: " + e.getMessage());
+            }
+        });
+
+        app.get("/backup", ctx -> {
+            try {
+                ctx.json(dao.GerenciadorBackup.listarBackups());
+            } catch (Exception e) {
+                ctx.status(500).result("Erro ao listar backups: " + e.getMessage());
+            }
+        });
+
+        app.post("/restaurar", ctx -> {
+            try {
+                var body = ctx.bodyAsClass(java.util.Map.class);
+                String arquivo = (String) body.get("arquivo");
+                if (arquivo == null || arquivo.isBlank()) {
+                    ctx.status(400).result("Informe o campo 'arquivo' com o nome do backup.");
+                    return;
+                }
+                dao.GerenciadorBackup.restaurar(arquivo);
+                ctx.status(200).result("Backup restaurado com sucesso: " + arquivo);
+            } catch (Exception e) {
+                ctx.status(500).result("Erro ao restaurar backup: " + e.getMessage());
+            }
+        });
+
         app.start(8080);
         System.out.println("Servidor iniciado! Acesse: http://localhost:8080");
     }
