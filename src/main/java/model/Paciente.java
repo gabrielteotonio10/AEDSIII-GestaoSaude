@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import crypto.CriptografiaXOR;
+
 public class Paciente implements Registro {
     // Variáveis principais
     private int id;
@@ -82,7 +84,8 @@ public class Paciente implements Registro {
         dos.writeInt(this.id);
         // Guarda o tamanho (4 bytes) e depois a informação
         dos.writeUTF(this.nome);
-        dos.writeUTF(this.cpf);
+        // CPF e um dado sensivel (PII): gravado cifrado com XOR no arquivo
+        dos.writeUTF(CriptografiaXOR.cifrar(this.cpf));
         // Grava um número inteiro (4 bytes) dizendo quantos itens a lista tem
         dos.writeInt(this.alergias.size());
         // Percorre a lista e grava cada string
@@ -104,7 +107,8 @@ public class Paciente implements Registro {
         // Lê os 2 primeiros bytes para saber o tamanho, depois lê o resto e monta a
         // string
         this.nome = dis.readUTF();
-        this.cpf = dis.readUTF();
+        // CPF foi gravado cifrado (XOR): decifra ao ler de volta para a memoria
+        this.cpf = CriptografiaXOR.decifrar(dis.readUTF());
         // Lê a quantidade depois lê cada string e adiciona na lista
         int quantidadeAlergias = dis.readInt();
         for (int i = 0; i < quantidadeAlergias; i++) {

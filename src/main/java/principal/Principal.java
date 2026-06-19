@@ -12,6 +12,7 @@ public class Principal {
                 System.out.println("---------------------------------------");
                 System.out.println("> Início");
                 System.out.println("\n1 - Gerenciar Pacientes");
+                System.out.println("2 - Pesquisar por padrão (KMP / BM)");
                 System.out.println("0 - Sair");
                 System.out.print("\nOpção: ");
 
@@ -21,7 +22,7 @@ public class Principal {
                     opcao = -1;
                 }
 
-                while (opcao != 1 && opcao != 0) {
+                while (opcao != 0 && opcao != 1 && opcao != 2) {
                     System.out.println("\nErro, opção inválida! Tente novamente: ");
                     try {
                         opcao = Integer.valueOf(console.nextLine());
@@ -32,8 +33,12 @@ public class Principal {
 
                 switch (opcao) {
                     case 1:
-                        MenuPacientes menuPacientes = new MenuPacientes();
+                        MenuPacientes menuPacientes = new MenuPacientes(console);
                         menuPacientes.menu();
+                        break;
+                    case 2:
+                        MenuPesquisa menuPesquisa = new MenuPesquisa(console);
+                        menuPesquisa.menu();
                         break;
                     case 0:
                         System.out.println("Encerrando o sistema... Até logo!");

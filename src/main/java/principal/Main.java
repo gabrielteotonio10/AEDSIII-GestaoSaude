@@ -128,6 +128,26 @@ public class Main {
             }
         });
 
+        // Pesquisa por casamento de padroes (KMP / Boyer-Moore) sobre o nome.
+        // Rota especifica ANTES da generica /pacientes/{id}.
+        // Ex.: GET /pacientes/buscar?padrao=ana&algoritmo=bm
+        app.get("/pacientes/buscar", ctx -> {
+            try {
+                String padrao = ctx.queryParam("padrao");
+                String algoritmo = ctx.queryParam("algoritmo");
+                if (padrao == null || padrao.isBlank()) {
+                    ctx.status(400).result("Informe o parâmetro 'padrao'.");
+                    return;
+                }
+                if (algoritmo == null || algoritmo.isBlank()) {
+                    algoritmo = "kmp";
+                }
+                ctx.json(new PacienteDAO().pesquisarPorNome(padrao, algoritmo));
+            } catch (Exception e) {
+                ctx.status(500).result("Erro: " + e.getMessage());
+            }
+        });
+
         app.get("/pacientes/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));

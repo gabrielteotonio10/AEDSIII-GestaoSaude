@@ -10,10 +10,11 @@ import dao.PacienteDAO;
 
 public class MenuPacientes {
     private PacienteDAO pacienteDAO;
-    private Scanner console = new Scanner(System.in);
+    private Scanner console;
 
-    public MenuPacientes() throws Exception {
+    public MenuPacientes(Scanner console) throws Exception {
         pacienteDAO = new PacienteDAO();
+        this.console = console;
     }
 
     public void menu() {
